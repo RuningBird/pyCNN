@@ -11,7 +11,7 @@ mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)  # 读取数据�
 
 def layer(inputs, size_input, size_output, active_function=None):
     W = tf.Variable(tf.random_normal([size_input, size_output], 0.5, 1))
-    b = tf.Variable(tf.zeros([1, size_output]) + 0.1)
+    b = tf.Variable(tf.zeros([1, size_output]) + 0.1)#1可加可不加
     evidence = tf.matmul(inputs, W) + b
     if active_function == None:
         return evidence
@@ -43,6 +43,7 @@ def compute_accuracy(vs, vy):
     return sess.run(accuracy)#方法
 
 
+
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     for i in range(2000):
@@ -51,3 +52,4 @@ with tf.Session() as sess:
         if i % 19 == 0:
            acc = compute_accuracy(mnist.test.images,mnist.test.labels)
            print(acc)
+
