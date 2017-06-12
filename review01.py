@@ -44,7 +44,7 @@ h_poo1l = max_pool_2x2(h_conv1)
 ### 2.2 卷积层2 ###
 kernel_conv2 = weight_variable([5, 5, 32, 64])
 bias_conv2 = bias_variable([64])
-h_conv2 = tf.nn.relu(conv2d(x_image, kernel_conv1) + bias_conv1)
+h_conv2 = tf.nn.relu(conv2d(h_poo1l, kernel_conv2) + bias_conv2)
 h_poo12 = max_pool_2x2(h_conv2)
 ## 此时图像为：64*【7，7】
 
@@ -63,3 +63,25 @@ h_dropout = tf.nn.dropout(h_fc1, keep_prob=drop_prob)
 fc2_weight = weight_variable([1024, 10])
 fc2_bias = bias_variable([10])
 prediction = tf.nn.softmax(tf.matmul(h_dropout, fc2_weight) + fc2_bias)
+
+################################## 4, 学习方法设置 ###############################
+### 4.1 定义代价函数：corss | loss
+# cross_entropy = tf.reduce_mean(-tf.reduce_sum(y * tf.log(prediction)))
+cross_entropy = -tf.reduce_sum(y * tf.log(prediction))
+### 4.2 定义学习（优化）方法 ###
+optimizer = tf.train.AdamOptimizer(1e-4)
+## 4.3 定义学习（优化）方向 ###
+train_step = optimizer.minimize(cross_entropy)
+
+################################## 5, 评估方法设置#######################################
+correct_prediction = tf.equal(tf.arg_max(y, 1), tf.arg_max(prediction, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+################################## 6, 训练 #######################################
+sess.run(tf.global_variables_initializer())
+for i in range(1000):
+    batch = mnist.train.next_batch(50)
+    train_step.run(feed_dict={x: batch[0], y: batch[1], drop_prob: 0.5})
+    if i % 50 == 0:
+        print("at step %s ,accuracy is %s" % (i, accuracy.eval(feed_dict={x: batch[0], y: batch[1], drop_prob: 1.0})))
+print("finall accuracy is %s", accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels, drop_prob: 1.0}))

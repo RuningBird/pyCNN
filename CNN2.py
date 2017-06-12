@@ -60,7 +60,6 @@ h_fc1_dropout = tf.nn.dropout(h_fc1, keep_prob=keep_prob)
 ### 2.6 正则化-softmax ###
 fc_w2 = weight_variable([1024, 10])
 fc_b2 = bias_variable([10])
-
 prediction = tf.nn.softmax(tf.matmul(h_fc1_dropout, fc_w2) + fc_b2)
 
 ### 3.1 定义训练方法 ###
