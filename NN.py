@@ -25,7 +25,7 @@ ys = tf.placeholder(tf.float32, [None, 10])
 prediction = layer(xs, 784, 10, tf.nn.softmax)
 
 ### 定义训练方法
-# 定义loss或者cross
+# 代价函数：loss或者cross
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction),1))
 # 学习方法
 optimizer = tf.train.GradientDescentOptimizer(0.5)
@@ -37,7 +37,7 @@ train = optimizer.minimize(cross_entropy)
 def compute_accuracy(vs, vy):
     global prediction
     y_prediction = sess.run(prediction,feed_dict={xs:vs})#sess
-    correct_prediction = tf.equal(tf.arg_max(y_prediction,1), tf.arg_max(vy,1))
+    correct_prediction = tf.equal(tf.argmax(y_prediction,1), tf.argmax(vy,1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     return sess.run(accuracy)#方法
 
