@@ -10,10 +10,12 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)  # 读取数据集
 # 网络结构函数
 def layer(inputs, input_size, output_size, active_function=None):
     W = tf.truncated_normal(shape=[input_size, output_size], stddev=0.5)  # 初始化权值
-    b = tf.truncated_normal(shape=[1, output_size], stddev=0.1)  # 初始化偏差
+    # b = tf.truncated_normal(shape=[1, output_size], stddev=0.1)  # 初始化偏差
+    b = tf.Variable(tf.zeros([1, output_size]) + 0.1)
+
     evidence = tf.matmul(inputs, W) + b
     if active_function:
-        return tf.nn.softmax(evidence)
+        return active_function(evidence)
     else:
         return evidence
 
@@ -30,7 +32,7 @@ prediction = layer(xs, 784, 10, tf.nn.softmax)
 ####### 配置训练方法 #######
 
 # 定义代价函数
-J = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction), 1))
+# J = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction), 1))
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction), 1))
 
 # 设置优化函数
@@ -39,11 +41,15 @@ optimizer = tf.train.GradientDescentOptimizer(0.1)
 train = optimizer.minimize(cross_entropy)
 
 sess.run(tf.global_variables_initializer())
+
 # ------------------------ 训练---------------------#
 for i in range(1000):
-    data = mnist.train.next_batch(50)
-    sess.run(train, feed_dict={xs: data[0], ys: data[1]})
+    # data = mnist.train.next_batch(50)
+    # sess.run(train, feed_dict={xs: data[0], ys: data[1]})
+    batch_xs, batch_ys = mnist.train.next_batch(100)
+    # print("训练集", sess.run(batch_ys))
+    sess.run(train, feed_dict={xs: batch_xs, ys: batch_ys})
     if i % 20 == 0:
-        acc_mat = tf.equal(tf.argmax(prediction, 1), tf.argmax(data[1]))
+        acc_mat = tf.equal(tf.argmax(prediction, 1), tf.argmax(batch_ys))
         acc = tf.reduce_mean(tf.cast(acc_mat, tf.float32))
         print("训练准确率：", acc)
