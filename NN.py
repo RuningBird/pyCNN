@@ -13,7 +13,7 @@ def layer(inputs, size_input, size_output, active_function=None):
     W = tf.Variable(tf.random_normal([size_input, size_output], 0.5, 1))
     b = tf.Variable(tf.zeros([1, size_output]) + 0.1)
     evidence = tf.matmul(inputs, W) + b
-    if active_function == None:
+    if not active_function:
         return evidence
     else:
         return active_function(evidence)
@@ -26,7 +26,7 @@ prediction = layer(xs, 784, 10, tf.nn.softmax)
 
 ### 定义训练方法
 # 代价函数：loss或者cross
-cross_entropy = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction),1))
+cross_entropy = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction), 1))
 # 学习方法
 optimizer = tf.train.GradientDescentOptimizer(0.5)
 # 学习目标
@@ -44,7 +44,7 @@ def compute_accuracy(vs, vy):
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    for i in range(1000):
+    for i in range(10000):
         batch_xs, batch_ys = mnist.train.next_batch(100)
         sess.run(train,feed_dict={xs:batch_xs,ys:batch_ys})
         if i % 20 == 0:

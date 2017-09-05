@@ -1,13 +1,11 @@
 
 ##########官方的例子，单层神经网络
 import tensorflow as tf
-
-sess = tf.InteractiveSession()
-
 from tensorflow.examples.tutorials.mnist import input_data
 
-mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
+mnist = input_data.read_data_sets('MNIST_data', one_hot=True) # 读取数据集
 
+sess = tf.InteractiveSession()
 x = tf.placeholder("float", shape=[None, 784])
 y_ = tf.placeholder("float", shape=[None, 10])
 
