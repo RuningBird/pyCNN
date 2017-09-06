@@ -9,10 +9,8 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)  # 读取数据集
 
 # 网络结构函数
 def layer(inputs, input_size, output_size, active_function=None):
-    W = tf.truncated_normal(shape=[input_size, output_size], stddev=0.5)  # 初始化权值
-    # b = tf.truncated_normal(shape=[1, output_size], stddev=0.1)  # 初始化偏差
-    b = tf.Variable(tf.zeros([1, output_size]) + 0.1)
-
+    W = tf.Variable(tf.truncated_normal(shape=[input_size, output_size], stddev=0.5))  # 初始化权值
+    b = tf.Variable(tf.truncated_normal(shape=[1, output_size], stddev=0.1))  # 初始化偏差
     evidence = tf.matmul(inputs, W) + b
     if active_function:
         return active_function(evidence)
@@ -24,7 +22,6 @@ def layer(inputs, input_size, output_size, active_function=None):
 sess = tf.InteractiveSession()
 
 # 定义网络结构
-# 设置迭代变量
 xs = tf.placeholder(tf.float32, [None, 784])
 ys = tf.placeholder(tf.float32, [None, 10])
 prediction = layer(xs, 784, 10, tf.nn.softmax)
@@ -32,24 +29,28 @@ prediction = layer(xs, 784, 10, tf.nn.softmax)
 ####### 配置训练方法 #######
 
 # 定义代价函数
-# J = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction), 1))
-cross_entropy = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction), 1))
-
+J = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction), 1))
 # 设置优化函数
 optimizer = tf.train.GradientDescentOptimizer(0.1)
 # 设置优化目标
-train = optimizer.minimize(cross_entropy)
+train = optimizer.minimize(J)
 
 sess.run(tf.global_variables_initializer())
 
+
+# 定义准确率
+def compute_accuracy(vs, vy):
+    global prediction
+    y_prediction = sess.run(prediction, feed_dict={xs: vs})  # sess
+    correct_prediction = tf.equal(tf.argmax(y_prediction, 1), tf.argmax(vy, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    return sess.run(accuracy)  # 方法
+
+
 # ------------------------ 训练---------------------#
 for i in range(1000):
-    # data = mnist.train.next_batch(50)
-    # sess.run(train, feed_dict={xs: data[0], ys: data[1]})
-    batch_xs, batch_ys = mnist.train.next_batch(100)
-    # print("训练集", sess.run(batch_ys))
-    sess.run(train, feed_dict={xs: batch_xs, ys: batch_ys})
+    data = mnist.train.next_batch(50)
+    sess.run(train, feed_dict={xs: data[0], ys: data[1]})
     if i % 20 == 0:
-        acc_mat = tf.equal(tf.argmax(prediction, 1), tf.argmax(batch_ys))
-        acc = tf.reduce_mean(tf.cast(acc_mat, tf.float32))
+        acc = compute_accuracy(mnist.train.images, mnist.train.labels)
         print("训练准确率：", acc)
