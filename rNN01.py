@@ -1,12 +1,8 @@
-# 复习神经网络
-
 # 　导入数据集
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data  # 导入读取/下载数据集函数
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)  # 读取数据集
-
-
 # 网络结构函数
 def layer(inputs, input_size, output_size, active_function=None):
     W = tf.Variable(tf.truncated_normal(shape=[input_size, output_size], stddev=0.5))  # 初始化权值
@@ -16,8 +12,6 @@ def layer(inputs, input_size, output_size, active_function=None):
         return active_function(evidence)
     else:
         return evidence
-
-
 # 定义Session
 sess = tf.InteractiveSession()
 
@@ -27,7 +21,6 @@ ys = tf.placeholder(tf.float32, [None, 10])
 prediction = layer(xs, 784, 10, tf.nn.softmax)
 
 ####### 配置训练方法 #######
-
 # 定义代价函数
 J = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction), 1))
 # 设置优化函数
@@ -37,7 +30,6 @@ train = optimizer.minimize(J)
 
 sess.run(tf.global_variables_initializer())
 
-
 # 定义准确率
 def compute_accuracy(vs, vy):
     global prediction
@@ -45,7 +37,6 @@ def compute_accuracy(vs, vy):
     correct_prediction = tf.equal(tf.argmax(y_prediction, 1), tf.argmax(vy, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     return sess.run(accuracy)  # 方法
-
 
 # ------------------------ 训练---------------------#
 for i in range(1000):

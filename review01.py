@@ -11,6 +11,7 @@ sess = tf.InteractiveSession()
 def weight_variable(shape):
     return tf.Variable(tf.truncated_normal(shape=shape, stddev=0.1))
 
+kernel_conv1 = weight_variable([5, 5, 1, 32])
 
 ### 1.2 定义构造函数：偏置 ###
 def bias_variable(shape):
